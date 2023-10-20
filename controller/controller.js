@@ -1,7 +1,5 @@
 var Userdb = require('../model/model');
-// create and save new user
-
-
+// create and save new user in CRUD API
 exports.create = (req, res) => {
     // validate request
     if (!req.body) {
