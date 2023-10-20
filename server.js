@@ -1,8 +1,9 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
-const bodyparser=require('body-parser');
-const path=require('path')
+const bodyParser=require('body-parser');
+const path=require('path');
+const cors = require('cors')
 const connectDB=require('./database/connection')
 dotenv.config( { path : 'config/config.env'} )
 
@@ -15,7 +16,9 @@ app.use(morgan('tiny'));
 // call the databases
 connectDB();
 // body parser 
-app.use(bodyparser.urlencoded({extended:true}))
+// app.use(cors())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // set the view engine
 app.set("view engine",'ejs');
