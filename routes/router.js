@@ -3,6 +3,7 @@ const route = express.Router()
 const services = require('../services/render')
 const controller = require('../controller/controller')
 const authcontroller = require('../controller/authcontroller')
+const authmiddleware=require('../middleware/auth-middleware')
 /**
  *  @description Root Route
  *  @method GET/
@@ -32,11 +33,31 @@ route.post('/signUp', services.userSignup)
  *  @description userLogin
  *  @method POST/user-Login
  */
-route.post('/signin', services.userLogin)
+// Use the middleware for changing password
+// route.use('/changepassword', authmiddleware.checkUserAuth);
 
-// API Route
-route.post('/api/auth/signup', authcontroller.userSignup)
-route.post('/api/auth/signin', authcontroller.userLogin)
+// Public Routes
+route.post('/signin', services.userLogin);
+
+// API Public Routes
+route.post('/api/auth/signup', authcontroller.userSignup);
+route.post('/api/auth/signin', authcontroller.userLogin);
+//sendPasswordResetEmail 
+route.post('/password-reset-email',authcontroller.sendUserPasswordResetEmail)
+route.post('/api/auth/password-reset-email',authcontroller.sendUserPasswordResetEmail)
+// password Reset
+route.post('/password-reset/:id/:token',authcontroller.userPasswordReset)
+route.post('/api/auth/password-reset/:id/:token',authcontroller.userPasswordReset)
+// Protected Routes
+// Apply middleware only to the specific route you want to protect
+route.post('/changepassword', authmiddleware.checkUserAuth, authcontroller.changePassword);
+route.get('/LoggedUser',authmiddleware.checkUserAuth,authcontroller.loggedUser);
+// API Protected Routes (consistent with the middleware path)
+route.post('/api/auth/changepassword', authmiddleware.checkUserAuth, authcontroller.changePassword);
+// Get Loggedin User Route
+route.get('/api/auth/LoggedUser', authmiddleware.checkUserAuth, authcontroller.loggedUser);
+// Password Reset 
+
 
 //API Routes
 route.post('/api/users', controller.create)

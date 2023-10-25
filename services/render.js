@@ -59,3 +59,19 @@ exports.userLogin = (req, res) => {
       res.send(err)
     })
 }
+
+// changePassword service
+
+exports.changepassword= (req, res) => {
+  // question it's logic is not understand
+  axios
+    .get('http://localhost:3000/api/auth/changepassword', {
+      params: { id: req.query.id }
+    })
+    .then(userdata => {
+      res.render('change-password', { user: userdata.data })
+    })
+    .catch(err => {
+      res.send(err)
+    })
+}
