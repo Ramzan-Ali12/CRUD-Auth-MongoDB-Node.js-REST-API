@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken')
 // checkuser Auth
 // for change password we need to get token for password reset
 
+// Auth Middleware to check user Auth
 exports.checkUserAuth = async (req, res, next) => {
     let token
     const { authorization } = req.headers

@@ -2,7 +2,7 @@ var AuthModel = require('../model/auth')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 // const nodemailer = require('nodemailer')
-const {transporter}  = require('../config/emailconfig')
+const { transporter } = require('../config/emailconfig')
 
 // Auth API
 exports.userSignup = async (req, res) => {
@@ -156,15 +156,23 @@ exports.sendUserPasswordResetEmail = async (req, res) => {
       // console.log(link)
       let info = await transporter.sendMail({
         from: process.env.EMAIL_FROM,
-        to: user.email,
-        subject: 'Authentication-Password Reset Link',
-        html: `<a href=${link}>Click Here</a> to Reset Your Password`
+        to: process.env.EMAIL_FROM,
+        subject: 'Password Reset Link',
+        template: ('main', { layout: 'index' }),
+        context: {
+          name: user.name,
+          link: link
+        }
+        html: 
       })
-      res.send({
-        status: 'success',
-        message: 'Password Reset Email Sent... Please Check Your Email',
-        "info":info
-      })
+      res.render('main', { layout: 'index' ,name:user.name,link:link})
+      // console.log(info)
+      // res.send({
+      //   status: 'success',
+      //   message: 'Password Reset Email Sent... Please Check Your Email',
+      //   "info":info
+      // })
+      
     } else {
       res
         .status(400)
@@ -188,12 +196,10 @@ exports.userPasswordReset = async (req, res) => {
     jwt.verify(token, new_secret)
     if (password && password_confirmation) {
       if (password !== password_confirmation) {
-        res
-          .status(400)
-          .send({
-            status: 'failed',
-            message: "New Password and Confirm New Password doesn't match!"
-          })
+        res.status(400).send({
+          status: 'failed',
+          message: "New Password and Confirm New Password doesn't match!"
+        })
       } else {
         const salt = await bcrypt.genSalt(10)
         const newHashPassword = await bcrypt.hash(password, salt)
