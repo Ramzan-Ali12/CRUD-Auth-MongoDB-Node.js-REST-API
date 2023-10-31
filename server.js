@@ -9,7 +9,7 @@ dotenv.config({ path: 'config/config.env' })
 //Loads the handlebars module
 const {engine}= require('express-handlebars');
 const handlebars = require('handlebars');
-
+const multer  = require('multer')
 const PORT = process.env.PORT || 8080
 const app = express()
 // this will print the log request
@@ -33,6 +33,7 @@ app.engine('hbs', engine({
 //Sets our app to use the handlebars engine
 app.set('view engine', 'hbs');
 app.use(express.static('public'))
+app.use(express.static('uploads'))
 
 // app.set('view engine', 'ejs')
 

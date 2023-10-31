@@ -1,5 +1,5 @@
-var Userdb = require('../model/model')
-var AuthModel = require('../model/auth')
+var Userdb = require('../model/crud-model')
+var AuthModel = require('../model/auth-model')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 

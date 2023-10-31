@@ -75,3 +75,16 @@ exports.changepassword= (req, res) => {
       res.send(err)
     })
 }
+exports.UploadImage= (req, res) => {
+  // question it's logic is not understand
+  axios
+    .get('http://localhost:3000/api/img/upload-image', {
+      params: { id: req.query.id }
+    })
+    .then(userdata => {
+      res.render('Upload-Image', { user: userdata.data })
+    })
+    .catch(err => {
+      res.send(err)
+    })
+}

@@ -1,9 +1,11 @@
 const express = require('express')
 const route = express.Router()
 const services = require('../services/render')
-const controller = require('../controller/controller')
-const authcontroller = require('../controller/authcontroller')
+const controller = require('../controller/crud-controller')
+const authcontroller = require('../controller/auth-controller')
 const authmiddleware=require('../middleware/auth-middleware')
+const imgcontroller=require('../controller/image-controller')
+const imgModel = require('../model/image-model')
 /**
  *  @description Root Route
  *  @method GET/
@@ -38,6 +40,11 @@ route.post('/signUp', services.userSignup)
 
 // Public Routes
 route.post('/signin', services.userLogin);
+// Route for Upload Image
+route.post('/upload-image',imgcontroller.UploadImage);
+// API Route for Upload Image
+route.post('/api/img/upload-image',imgcontroller.UploadImage);
+
 
 // API Public Routes
 route.post('/api/auth/signup', authcontroller.userSignup);

@@ -1,7 +1,7 @@
-var AuthModel = require('../model/auth')
+const AuthModel = require('../model/auth-model')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-// const nodemailer = require('nodemailer')
+const {hbs} = require('nodemailer-express-handlebars')
 const { transporter } = require('../config/emailconfig')
 
 // Auth API
@@ -139,51 +139,59 @@ exports.loggedUser = async (req, res) => {
 
 // Forget Password API
 exports.sendUserPasswordResetEmail = async (req, res) => {
-  const { email } = req.body
+  const { email } = req.body;
 
   if (email) {
-    // check the email is registered or not
-    const user = await AuthModel.findOne({ email: email })
-    // console.log(user)
-    if (user) {
-      // send the email to user logic
-      const secret = user._id + process.env.JWT_SECRET_KEY
-      const token = jwt.sign({ userID: user._id }, secret, {
-        expiresIn: '15m'
-      })
-      // send Link to the user
-      const link = `http://127.0.0.1:300/api/user/reset/${user._id}/${token}`
-      // console.log(link)
-      let info = await transporter.sendMail({
-        from: process.env.EMAIL_FROM,
-        to: process.env.EMAIL_FROM,
-        subject: 'Password Reset Link',
-        template: ('main', { layout: 'index' }),
-        context: {
-          name: user.name,
-          link: link
-        }
-        html: 
-      })
-      res.render('main', { layout: 'index' ,name:user.name,link:link})
-      // console.log(info)
-      // res.send({
-      //   status: 'success',
-      //   message: 'Password Reset Email Sent... Please Check Your Email',
-      //   "info":info
-      // })
-      
-    } else {
-      res
-        .status(400)
-        .send({ status: 'failed', message: "Email doesn't Exist!" })
+    try {
+      // Check if the email is registered
+      const user = await AuthModel.findOne({ email: email });
+
+      if (user) {
+        // Generate token
+        const secret = user._id + process.env.JWT_SECRET_KEY;
+        const token = jwt.sign({ userID: user._id }, secret, {
+          expiresIn: '15m',
+        });
+
+        // Construct password reset link
+        const link = `http://127.0.0.1:3000/api/user/reset/${user._id}/${token}`;
+       // Send Email
+        let info = await transporter.sendMail({
+          from: process.env.EMAIL_FROM,
+          to: user.email,
+          subject: "Request for Password Reset Link",
+          html: `<a href=${link}>Click Here</a> to Reset Your Password`
+        })
+        res.send({ "status": "success", "message": "Password Reset Email Sent... Please Check Your Email" })
+        // Render email template
+        // const emailContent = {
+        //   name: user.name,
+        //   link: link,
+        // };
+        // Log the entire email message
+        // console.log('Password Reset Email Content:', emailContent);
+        // console.log(user.email)
+        // Send the email to the user's email address
+        // let info = await transporter.sendMail({
+        //   to: user.email,
+        //   from: process.env.EMAIL_FROM,
+        //   subject: 'Password Reset Link',
+        //   template: ('main', { layout: 'index' }),
+        //   context: emailContent
+        // });
+        // Render response
+      //  res.render('main', { layout: 'index', name: user.name, link: link });
+      } else {
+        res.status(400).send({ status: 'failed', message: "Email doesn't Exist!" });
+      }
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      res.status(500).send({ status: 'error', message: 'Internal Server Error' });
     }
   } else {
-    res
-      .status(400)
-      .send({ status: 'failed', message: 'Email field is required!' })
+    res.status(400).send({ status: 'failed', message: 'Email field is required!' });
   }
-}
+};
 
 // UserPasword Reset API
 exports.userPasswordReset = async (req, res) => {
@@ -222,3 +230,5 @@ exports.userPasswordReset = async (req, res) => {
     res.status(400).send({ status: 'failed', message: 'Invalid Token!' })
   }
 }
+
+// API To Upload Image

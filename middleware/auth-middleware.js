@@ -1,5 +1,5 @@
-const authcontroller = require('../controller/authcontroller')
-var AuthModel = require('../model/auth')
+const authcontroller = require('../controller/auth-controller')
+var AuthModel = require('../model/auth-model')
 
 
 const jwt = require('jsonwebtoken')
